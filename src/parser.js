@@ -14,23 +14,21 @@ export function setSchema(newSchema) {
 function getFieldConfig(key, dataTypeSchema) {
     let datatype = getDataType(dataTypeSchema)
       , isMandatory = key.substr(-1) === '!'
-      , { string, number, ...nonPrimitivaDataTypes } = datatypes
+      , isArrayOf = isArrayOf(dataTypeSchema)
+      , { array, object, ...primitivaDataTypes } = datatypes
       , config = {
           key: isMandatory ? key.substr(0, key.length - 1) : key,
           mandatory: isMandatory,
           datatype: datatype,
+          isSimpleArray: isArrayOf !== null && typeof primitivaDataTypes[isArrayOf] !== 'undefined'
       }
       , children;
 
-      if (typeof nonPrimitivaDataTypes[datatype] !== 'undefined') {
-        if (datatype === datatypes.object) {
+      if (typeof primitivaDataTypes[datatype] === 'undefined') {
+        if (datatype === object) {
             children = Object.keys(dataTypeSchema)
-        } else {
-            let arrayOf = isArrayOf(dataTypeSchema)
-              , arrayDataType = getDataType(arrayOf);
-            if (typeof nonPrimitivaDataTypes[arrayDataType] !== 'undefined') {
-                children = Object.keys(arrayOf)
-            }
+        } else if (!config.isSimpleArray) {
+            children = Object.keys(arrayOf)
         }
       }
 
