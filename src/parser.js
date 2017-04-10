@@ -1,10 +1,12 @@
-import datatypes from './datatypes'
+import Datatypes from './datatypes'
 import {isArrayOf, isObject, isNumber, isString} from './utils'
 
 let schema
 
 export function getDOMElementFromJSON(json){
     console.log('JSON', json)
+
+    validateJSON('__root', json, schema)
 }
 
 export function setSchema(newSchema) {
@@ -13,27 +15,26 @@ export function setSchema(newSchema) {
 
 export function validateJSON(key, json, schema) {
     if (!schema)
-        throw `Error in ${key}. Schema not defined`
+        throw `Error in ${key} -> Schema not defined`
     if (key === '___root' && typeof json !== 'object')
         throw "JSON root must be an object"
     if (key === '___root' && Array.isArray(json))
         throw "JSON root must not be an array"
 
     let { mandatoryChildren, ...config } = getFieldConfig(key, schema)
-      , fields = Object.keys(json)
       , lastChecked = null
       , isValid = true
 
-    if (config.datatype === datatypes.string && typeof json !== 'string') {
+    if (config.datatype === Datatypes.string && typeof json !== 'string') {
         throw `Error in ${key}. Value must be of type string`
     }
 
-    if (config.datatype === datatypes.number && typeof json !== 'number') {
+    if (config.datatype === Datatypes.number && typeof json !== 'number') {
         throw `Error in ${key}. Value must be of type number`
     }
 
     try {
-        if (config.datatype = datatypes.array) {
+        if (config.datatype === Datatypes.array) {
             let lastIndex = 0
             if (config.isSimpleArray) {
                 isValid = json.every((child, index) => {
@@ -55,8 +56,8 @@ export function validateJSON(key, json, schema) {
             }
         } else {
             isValid = mandatoryChildren.every(child => {
-                lastChecked = child
-                return typeof fields[child] !== 'undefined'
+                lastChecked = child = child.substr(0, child.length - 1)
+                return typeof json[child] !== 'undefined'
             })
 
             if (!isValid)
@@ -67,7 +68,7 @@ export function validateJSON(key, json, schema) {
             })
         }
     } catch (exception) {
-        throw `Error in ${key} -> ${exception.message}`
+        throw `Error in ${key} -> ${exception.message || exception}`
     }
 
     return true
@@ -76,14 +77,14 @@ export function validateJSON(key, json, schema) {
 function getFieldConfig(key, dataTypeSchema) {
     let datatype = getDataType(dataTypeSchema)
       , isMandatory = key.substr(-1) === '!'
-      , isArrayOf = isArrayOf(dataTypeSchema)
-      , { array, object, ...primitivaDataTypes } = datatypes
+      , isArrayOfValue = isArrayOf(dataTypeSchema)
+      , { array, object, ...primitivaDataTypes } = Datatypes
       , config = {
           key: isMandatory ? key.substr(0, key.length - 1) : key,
           mandatory: isMandatory,
           datatype: datatype,
-          isArrayOf: isArrayOf,
-          isSimpleArray: isArrayOf !== null && typeof primitivaDataTypes[isArrayOf] !== 'undefined'
+          isArrayOfValue: isArrayOfValue,
+          isSimpleArray: isArrayOfValue !== null && typeof primitivaDataTypes[isArrayOfValue] !== 'undefined'
       }
       , children;
 
@@ -106,12 +107,12 @@ function getFieldConfig(key, dataTypeSchema) {
 
 function getDataType(dataTypeSchema){
     if (isString(dataTypeSchema)) {
-        return datatypes.string
+        return Datatypes.string
     } else if (isNumber(dataTypeSchema)) {
-        return datatypes.number
+        return Datatypes.number
     } else if (isObject(dataTypeSchema)) {
-        return datatypes.object
+        return Datatypes.object
     } else {
-        return datatypes.array
+        return Datatypes.array
     }
 }
