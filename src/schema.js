@@ -31,7 +31,7 @@ module.exports = {
         "degree": "string",
         "startDate": "date",
         "endDate": "date",
-        "score!": "number",
+        "score": "number",
         "courses": "string[]"
     }],
     "volunteer": [{
