@@ -8,7 +8,38 @@ export function getDOMElementFromJSON(json){
 }
 
 export function setSchema(newSchema) {
-    console.log('SET', (schema = {...newSchema}))
+    schema = newSchema
+}
+
+export function validateJSON(key, json, schema) {
+    if (!schema)
+        throw "Schema not defined"
+    if (key === '___root' && typeof json !== 'object')
+        throw "JSON root must be an object"
+    if (key === '___root' && Array.isArray(json))
+        throw "JSON root must not be an array"
+
+    let { mandatoryChildren, ...config } = getFieldConfig(key, schema)
+      , fields = Object.keys(json)
+      , lastChecked = null
+      , isValid = true
+
+    if (mandatoryChildren) {
+        isValid = mandatoryChildren.every(child => {
+            lastChecked = child
+            return typeof fields[child] !== 'undefined'
+        })
+    }
+
+    if (!isValid) {
+        throw `Mandatory field(${lastChecked}) not found, inside ${key}`
+    }
+
+    try {
+        Object.keys(json)
+    } catch (exception) {
+        throw `Error in ${key} -> ${exception.message}`
+    }
 }
 
 function getFieldConfig(key, dataTypeSchema) {
