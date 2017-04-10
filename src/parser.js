@@ -1,5 +1,5 @@
 import Datatypes from './datatypes'
-import {isArrayOf, isObject, isNumber, isString} from './utils'
+import {isArrayOf, isObject, isNumber, isString, isMandatory, getJSONKey} from './utils'
 
 let schema
 
@@ -15,7 +15,7 @@ export function setSchema(newSchema) {
 
 export function validateJSON(key, json, schema) {
     if (!schema)
-        throw `Error in ${key} -> Schema not defined`
+        throw `Error in \'${key}\' -> Schema not defined`
     if (key === '___root' && typeof json !== 'object')
         throw "JSON root must be an object"
     if (key === '___root' && Array.isArray(json))
@@ -26,11 +26,11 @@ export function validateJSON(key, json, schema) {
       , isValid = true
 
     if (config.datatype === Datatypes.string && typeof json !== 'string') {
-        throw `Error in ${key}. Value must be of type string`
+        throw `Error in \'${key}\'. Value must be of type string`
     }
 
     if (config.datatype === Datatypes.number && typeof json !== 'number') {
-        throw `Error in ${key}. Value must be of type number`
+        throw `Error in \'${key}\'. Value must be of type number`
     }
 
     try {
@@ -43,14 +43,14 @@ export function validateJSON(key, json, schema) {
                 })
 
                 if (!isValid)
-                    throw `Error at index ${lastIndex}. Array must contain data of type \'${config.isArrayOf}\'`
+                    throw `Error at index \'${lastIndex}\'. Array must contain data of type \'${config.isArrayOf}\'`
             } else {
                 json.every((child, index) => {
                     lastIndex = index
                     try {
                         validateJSON('__array', child, config.isArrayOf)
                     } catch (exception) {
-                        throw `Error at index ${lastIndex} -> ${exception.message}`
+                        throw `Error at index \'${lastIndex}\' -> ${exception.message}`
                     }
                 })
             }
@@ -63,12 +63,10 @@ export function validateJSON(key, json, schema) {
             if (!isValid)
                 throw `Mandatory field \'${lastChecked}\' not found`
 
-            Object.keys(json).every((child, index) => {
-                validateJSON(child, json[child], schema[child])
-            })
+            Object.keys(json).every(child => validateJSON(child, json[child], schema[child] || schema[child + '!']))
         }
     } catch (exception) {
-        throw `Error in ${key} -> ${exception.message || exception}`
+        throw `Error in \'${key}\' -> ${exception.message || exception}`
     }
 
     return true
@@ -76,12 +74,11 @@ export function validateJSON(key, json, schema) {
 
 function getFieldConfig(key, dataTypeSchema) {
     let datatype = getDataType(dataTypeSchema)
-      , isMandatory = key.substr(-1) === '!'
       , isArrayOfValue = isArrayOf(dataTypeSchema)
       , { array, object, ...primitivaDataTypes } = Datatypes
       , config = {
-          key: isMandatory ? key.substr(0, key.length - 1) : key,
-          mandatory: isMandatory,
+          key: getJSONKey(key),
+          mandatory: isMandatory(key),
           datatype: datatype,
           isArrayOfValue: isArrayOfValue,
           isSimpleArray: isArrayOfValue !== null && typeof primitivaDataTypes[isArrayOfValue] !== 'undefined'

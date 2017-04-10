@@ -19,3 +19,11 @@ export function isString(schemaDataType) {
 export function isNumber(schemaDataType) {
     return schemaDataType === datatypes.number
 }
+
+export function isMandatory(key) {
+    return key.substr(-1) === '!'
+}
+
+export function getJSONKey(key) {
+    return isMandatory(key) ? key.substr(0, key.length - 1) : key
+}
