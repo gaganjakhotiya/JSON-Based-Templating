@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node node_modules/webpack-dev-server/bin/webpack-dev-server.js --config webpack.config.js",
-    "build": "node node_modules/webpack/bin/webpack.js --config webpack.config.js"
+    "build": "yarn && node node_modules/webpack/bin/webpack.js --config webpack.config.js"
   },
   "author": "",
   "license": "ISC",
