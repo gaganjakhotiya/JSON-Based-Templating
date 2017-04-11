@@ -12,18 +12,29 @@ module.exports = {
             "country!": "string",
             "pincode!": "string",
             "__template": `
-                <span>\${address}, \${city}, \${country}, PIN: \${pincode}</span>
+                <span class="location">\${address}, \${city}, \${country}, PIN: \${pincode}</span>
             `
         },
         "profiles": {
             "github": "string",
             "linkedin": "string",
+            "__template": `
+                <div class="profiles">
+                    <ul>
+                        <li><a href="\${github}">Github</a></li>
+                        <li><a href="\${linkedin}">LinkedIn</a></li>
+                    </ul>
+                </div>
+            `
         },
         "__template": `
-            <div>
+            <div class="basic">
                 <h1>\${name}</h1>
+                <hr/>
+                <p>\${summary}</p>
                 <p>Mobile: \${mobile}, E-Mail: \${email}</p>
                 <p>Address: \${location}</p>
+                <p>\${profiles}</p>
             </div>
         `
     },
@@ -34,6 +45,14 @@ module.exports = {
         "endDate": "string",
         "website": "string",
         "summary": "string",
+        "__template": `
+            <div class="work">
+                <h2>Work</h2>
+                <h4>\${company}</h4>
+                <p>\${startDate} - \${position}</p>
+                <p><a href="\${website}">\${company} website</a></p>
+            </div>
+        `
     }],
     "education!": [{
         "school!": "string",
@@ -43,7 +62,14 @@ module.exports = {
         "endDate": "string",
         "score": "number",
         "courses": "string[]",
-        "__template": "<div>${school}</div>",
+        "courses__template": "<li>${value}</li>",
+        "__template": `
+            <div class="education">
+                <h4>\${school}</h4>
+                <p>\${area}</p>
+                <ul>\${courses}</ul>
+            </div>
+        `
     }],
     "volunteer": [{
         "organization!": "string",
@@ -76,13 +102,23 @@ module.exports = {
         "name!": "string",
         "note!": "string"
     }],
-    "work__template": "",
+    "work__template": "<div>${value}</div>",
     "education__template": "<div>${value}</div>",
-    "volunteer__template": "",
-    "awards__template": "",
-    "skills__template": "",
-    "languages__template": "",
-    "interests__template": "",
-    "references__template": "",
-    "__template": "<div>${basic}</div><div>${education}</div>"
+    "volunteer__template": "<div>${value}</div>",
+    "awards__template": "<div>${value}</div>",
+    "skills__template": "<div>${value}</div>",
+    "languages__template": "<div>${value}</div>",
+    "interests__template": "<div>${value}</div>",
+    "references__template": "<div>${value}</div>",
+    "__template": `
+        <div>\${basic}</div>
+        <div>\${work}</div>
+        <div>\${education}</div>
+        <div>\${volunteer}</div>
+        <div>\${awards}</div>
+        <div>\${skills}</div>
+        <div>\${languages}</div>
+        <div>\${interests}</div>
+        <div>\${references}</div>
+    `
 }

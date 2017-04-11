@@ -31,8 +31,8 @@ function createDOMNode(content){
 function fillTemplate(template, valueMap){
     let out =  template ? getKeys(template).reduce((updatedTemplate, templateLiteral) => {
 	    let templateKey = templateLiteral.substring(2, templateLiteral.length - 1)
-
-        return updatedTemplate.replace(templateLiteral, valueMap[templateKey])
+          , value = valueMap[templateKey]
+        return updatedTemplate.replace(templateLiteral, value == null ? '' : value)
     }, template) : ''
 
     return out
