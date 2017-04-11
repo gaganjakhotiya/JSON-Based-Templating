@@ -56,17 +56,17 @@ module.exports = {
     }],
     "education!": [{
         "school!": "string",
-        "area": "string",
-        "degree": "string",
+        "area!": "string",
+        "degree!": "string",
+        "score!": "number",
         "startDate": "string",
         "endDate": "string",
-        "score": "number",
         "courses": "string[]",
         "courses__template": "<li>${value}</li>",
         "__template": `
             <div class="education">
                 <h4>\${school}</h4>
-                <p>\${area}</p>
+                <p>\${degree}, \${area}, \${score}</p>
                 <ul>\${courses}</ul>
             </div>
         `
@@ -77,30 +77,72 @@ module.exports = {
         "startDate!": "string",
         "endDate!": "string",
         "website": "string",
-        "summary": "string"
+        "summary": "string",
+        "__template": `
+            <div class="volunteer">
+                <h4>\${organization}</h4>
+                <h5>\${position}</h5>
+                <p>\${startDate} - \${endDate}</p>
+                <p>Link: \${website}</p>
+                <p>\${summary}</p>
+            </div>
+        `
     }],
     "awards": [{
         "title!": "string",
-        "string": "string",
+        "date": "string",
         "awarder": "string",
-        "summary": "string"
+        "summary": "string",
+        "__template": `
+            <div class="award">
+                <h3>\${title}</h3>
+                <span>\${date} \${awarder}</span>
+                <span>\${summary}</span>
+            </div>
+        `
     }],
     "skills!": [{
         "name!": "string",
         "level": "string",
-        "keywords": "string[]"
+        "keywords": "string[]",
+        "keywords__template": `\${value} `,
+        "__template": `
+            <div class="award">
+                <div><em>\${name}</em> - \${level}</div>
+                <sup>\${keywords}</sup>
+            </div>
+        `
     }],
     "languages!": [{
         "name!": "string",
-        "level": "string"
+        "level": "string",
+        "__template": `
+            <div class="language">
+                <p>
+                    <em>\${name}</em> - <span>\${level}<span>
+                </p>
+            </div>
+        `
     }],
     "interests": [{
         "name!": "string",
-        "keywords": "string[]"
+        "keywords": "string[]",
+        "__template": `
+            <div class="interest">
+                <h3>\${name}</h3>
+                <span>\${level}<span>
+            </div>
+        `
     }],
     "references": [{
         "name!": "string",
-        "note!": "string"
+        "note!": "string",
+        "__template": `
+            <div class="reference">
+                <h3>\${name}</h3>
+                <span>\${note}<span>
+            </div>
+        `
     }],
     "work__template": "<div>${value}</div>",
     "education__template": "<div>${value}</div>",
@@ -113,11 +155,20 @@ module.exports = {
     "__template": `
         <div>\${basic}</div>
         <div>\${work}</div>
-        <div>\${education}</div>
+        <div>
+            <h2>Education</h2>
+            \${education}
+        </div>
         <div>\${volunteer}</div>
         <div>\${awards}</div>
-        <div>\${skills}</div>
-        <div>\${languages}</div>
+        <div>
+            <h2>Skills</h2>
+            \${skills}
+        </div>
+        <div>
+            <h2>Languages</h2>
+            \${languages}
+        </div>
         <div>\${interests}</div>
         <div>\${references}</div>
     `
