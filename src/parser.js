@@ -20,6 +20,44 @@ function verifyJSONDatatype(json, datatype, key){
     }
 }
 
+function validateArray(json, config){
+    let lastIndex = 0
+    if (config.isSimpleArray) {
+        let isValid = json.every((child, index) => {
+            lastIndex = index
+            return typeof child === config.isArrayOf
+        })
+
+        if (!isValid)
+            throw `Error at index \'${lastIndex}\'. Array must contain data of type \'${config.isArrayOf}\'`
+    } else {
+        json.every((child, index) => {
+            lastIndex = index
+            try {
+                validateJSON('__array', child, config.isArrayOf)
+            } catch (exception) {
+                throw `Error at index \'${lastIndex}\' -> ${exception.message}`
+            }
+        })
+    }
+}
+
+function validateObject(json, config, schema){
+    let mandatoryItems = config.mandatoryChildren
+      , lastChecked = null
+      , isValid = !mandatoryItems || mandatoryItems.every(child => {
+          lastChecked = child = child.substr(0, child.length - 1)
+          return typeof json[child] !== 'undefined'
+      })
+
+    if (!isValid)
+        throw `Mandatory field \'${lastChecked}\' not found`
+
+    Object.keys(json).every(
+        child => validateJSON(child, json[child], schema[child] || schema[child + '!'])
+    )
+}
+
 export function validateJSON(key, json, schema) {
     if (!schema)
         throw `Error in \'${key}\' -> Schema not defined`
@@ -28,51 +66,23 @@ export function validateJSON(key, json, schema) {
     if (key === '___root' && Array.isArray(json))
         throw "JSON root must not be an array"
 
-    let { mandatoryChildren, ...config } = getFieldConfig(key, schema)
-      , lastChecked = null
-      , isValid = true
-
+    let config = getFieldConfig(key, schema)
     verifyJSONDatatype(json, config.datatype, key)
+
     if (config.datatype === Datatypes.string || config.datatype === Datatypes.number) {
         return true
     }
 
     try {
         if (config.datatype === Datatypes.array) {
-            let lastIndex = 0
-            if (config.isSimpleArray) {
-                isValid = json.every((child, index) => {
-                    lastIndex = index
-                    return typeof child === config.isArrayOf
-                })
-
-                if (!isValid)
-                    throw `Error at index \'${lastIndex}\'. Array must contain data of type \'${config.isArrayOf}\'`
-            } else {
-                json.every((child, index) => {
-                    lastIndex = index
-                    try {
-                        validateJSON('__array', child, config.isArrayOf)
-                    } catch (exception) {
-                        throw `Error at index \'${lastIndex}\' -> ${exception.message}`
-                    }
-                })
-            }
+            validateArray(json, config)
         } else {
-            isValid = !mandatoryChildren || mandatoryChildren.every(child => {
-                lastChecked = child = child.substr(0, child.length - 1)
-                return typeof json[child] !== 'undefined'
-            })
-
-            if (!isValid)
-                throw `Mandatory field \'${lastChecked}\' not found`
-
-            Object.keys(json).every(child => validateJSON(child, json[child], schema[child] || schema[child + '!']))
+            validateObject(json, config, schema)
         }
     } catch (exception) {
         throw `Error in \'${key}\' -> ${exception.message || exception}`
     }
-
+k
     return true
 }
 
