@@ -13,6 +13,13 @@ export function setSchema(newSchema) {
     schema = newSchema
 }
 
+function verifyJSONDatatype(json, datatype, key){
+    if ((datatype === Datatypes.array && !Array.isArray(json))
+        || typeof json !== datatype) {
+        throw `Expected an ${datatype} against \'${key}\'`
+    }
+}
+
 export function validateJSON(key, json, schema) {
     if (!schema)
         throw `Error in \'${key}\' -> Schema not defined`
@@ -25,25 +32,13 @@ export function validateJSON(key, json, schema) {
       , lastChecked = null
       , isValid = true
 
-    if (config.datatype === Datatypes.string) {
-        if (typeof json !== 'string')
-            throw `Error in \'${key}\'. Value must be of type string`
-        else
-            return true
-    }
-
-    if (config.datatype === Datatypes.number) {
-        if (typeof json !== 'number')
-            throw `Error in \'${key}\'. Value must be of type number`
-        else
-            return true
+    verifyJSONDatatype(json, config.datatype, key)
+    if (config.datatype === Datatypes.string || config.datatype === Datatypes.number) {
+        return true
     }
 
     try {
         if (config.datatype === Datatypes.array) {
-            if (!Array.isArray(json))
-                throw `Expected an array against \'${key}\'`
-
             let lastIndex = 0
             if (config.isSimpleArray) {
                 isValid = json.every((child, index) => {
@@ -64,9 +59,6 @@ export function validateJSON(key, json, schema) {
                 })
             }
         } else {
-            if (typeof json !== 'object')
-                throw `Expected an object against \'${key}\'`
-
             isValid = !mandatoryChildren || mandatoryChildren.every(child => {
                 lastChecked = child = child.substr(0, child.length - 1)
                 return typeof json[child] !== 'undefined'
