@@ -3,9 +3,9 @@ Use JSON data to create HTML DOM
 
 ## Usage
 Dependencies
-NPM
-Node.js
-Yarn
+1. NPM
+2. Node.js
+3. Yarn
 
 Run Project
 ```bash
