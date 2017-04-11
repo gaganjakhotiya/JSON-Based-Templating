@@ -88,21 +88,20 @@ function getFieldConfig(key, dataTypeSchema) {
       }
       , children = null;
 
-      if (!isPrimitiveDataType) {
-        if (datatype === object) {
-            children = Object.keys(dataTypeSchema)
-        } else if (!config.isSimpleArray) {
-            children = Object.keys(isArrayOfSchema)
-        }
-      }
+    if (!isPrimitiveDataType) {
+        let childObject = (datatype === object && dataTypeSchema)
+            || (!config.isSimpleArray && isArrayOfSchema) || null
 
-      config = {
-          ...config,
-          children,
-          mandatoryChildren: children && children.filter(child => child.substr(-1) === '!')
-      }
+        children = childObject && Object.keys(childObject).filter(field => field.substr(-10) !== '__template')
+    }
 
-      return config
+    config = {
+        ...config,
+        children,
+        mandatoryChildren: children && children.filter(child => child.substr(-1) === '!')
+    }
+      
+    return config
 }
 
 function getDataType(dataTypeSchema){
