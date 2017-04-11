@@ -27,3 +27,13 @@ export function isMandatory(key) {
 export function getJSONKey(key) {
     return isMandatory(key) ? key.substr(0, key.length - 1) : key
 }
+
+export function getDataTypeFromSchema(schema){
+    if (Array.isArray(schema)) {
+        return schema[0]
+    } else if (typeof schema === 'string' && schema.substr(-2) === '[]') {
+        return schema.substr(0, schema.length - 2)
+    } else {
+        return schema
+    }
+}

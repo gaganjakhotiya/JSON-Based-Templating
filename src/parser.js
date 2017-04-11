@@ -1,4 +1,5 @@
 import {validateJSON} from './validator'
+import {getDataTypeFromSchema} from './utils'
 
 export function setSchema(newSchema) {
     _schema = newSchema
@@ -14,12 +15,12 @@ export function getDOMElementFromJSON(json){
     return createDOMNode(parseJSON(json, _schema))
 }
 
-// Private Methods
+// Private Stuff
 
 let _schema
 
 function getKeys(str){
-	return str.match(/(?:^|\$){(.*?)(?:}|$)/g)
+	return str.match(/(?:^|\$){(.*?)(?:}|$)/g) || []
 }
 function createDOMNode(content){
     let node = document.createElement('div')
@@ -37,19 +38,19 @@ function fillTemplate(template, valueMap){
     return out
 }
 
-function parseJSON(json, schema, template){
+function parseJSON(json, schema, arrayTemplate){
     let output = ''
     if (Array.isArray(json)) {
         output = json.reduce((updatedTemplate, item) => {
             let value = typeof item === 'object' ? parseJSON(item, schema) : item
 
-            return updatedTemplate + fillTemplate(template, {value: value})
+            return updatedTemplate + fillTemplate(arrayTemplate, {value: value})
         }, '')
     } else if (typeof json === 'object') {
         let valueMap = {...json}
 
         Object.keys(valueMap).forEach(field => {
-            let fieldSchema = schema[field] || schema[field + '!']
+            let fieldSchema = getDataTypeFromSchema(schema[field] || schema[field + '!'])
             if (!fieldSchema)
                 return
 

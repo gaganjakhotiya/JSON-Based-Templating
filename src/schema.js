@@ -11,12 +11,21 @@ module.exports = {
             "city!": "string",
             "country!": "string",
             "pincode!": "string",
+            "__template": `
+                <span>\${address}, \${city}, \${country}, PIN: \${pincode}</span>
+            `
         },
         "profiles": {
             "github": "string",
             "linkedin": "string",
         },
-        "__template": "<div><h1>${name}</h1></div>"
+        "__template": `
+            <div>
+                <h1>\${name}</h1>
+                <p>Mobile: \${mobile}, E-Mail: \${email}</p>
+                <p>Address: \${location}</p>
+            </div>
+        `
     },
     "work": [{
         "company!": "string",
@@ -33,7 +42,8 @@ module.exports = {
         "startDate": "string",
         "endDate": "string",
         "score": "number",
-        "courses": "string[]"
+        "courses": "string[]",
+        "__template": "<div>${school}</div>",
     }],
     "volunteer": [{
         "organization!": "string",
@@ -67,12 +77,12 @@ module.exports = {
         "note!": "string"
     }],
     "work__template": "",
-    "education__template": "",
+    "education__template": "<div>${value}</div>",
     "volunteer__template": "",
     "awards__template": "",
     "skills__template": "",
     "languages__template": "",
     "interests__template": "",
     "references__template": "",
-    "__template": "<div>${basic}</div>"
+    "__template": "<div>${basic}</div><div>${education}</div>"
 }
