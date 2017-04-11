@@ -25,12 +25,18 @@ export function validateJSON(key, json, schema) {
       , lastChecked = null
       , isValid = true
 
-    if (config.datatype === Datatypes.string && typeof json !== 'string') {
-        throw `Error in \'${key}\'. Value must be of type string`
+    if (config.datatype === Datatypes.string) {
+        if (typeof json !== 'string')
+            throw `Error in \'${key}\'. Value must be of type string`
+        else
+            return true
     }
 
-    if (config.datatype === Datatypes.number && typeof json !== 'number') {
-        throw `Error in \'${key}\'. Value must be of type number`
+    if (config.datatype === Datatypes.number) {
+        if (typeof json !== 'number')
+            throw `Error in \'${key}\'. Value must be of type number`
+        else
+            return true
     }
 
     try {
@@ -55,7 +61,7 @@ export function validateJSON(key, json, schema) {
                 })
             }
         } else {
-            isValid = mandatoryChildren.every(child => {
+            isValid = !mandatoryChildren || mandatoryChildren.every(child => {
                 lastChecked = child = child.substr(0, child.length - 1)
                 return typeof json[child] !== 'undefined'
             })
@@ -74,29 +80,30 @@ export function validateJSON(key, json, schema) {
 
 function getFieldConfig(key, dataTypeSchema) {
     let datatype = getDataType(dataTypeSchema)
-      , isArrayOfValue = isArrayOf(dataTypeSchema)
+      , isArrayOfSchema = isArrayOf(dataTypeSchema)
       , { array, object, ...primitivaDataTypes } = Datatypes
+      , isPrimitiveDataType = typeof primitivaDataTypes[datatype] !== 'undefined'
       , config = {
           key: getJSONKey(key),
           mandatory: isMandatory(key),
           datatype: datatype,
-          isArrayOfValue: isArrayOfValue,
-          isSimpleArray: isArrayOfValue !== null && typeof primitivaDataTypes[isArrayOfValue] !== 'undefined'
+          isArrayOfSchema: isArrayOfSchema,
+          isSimpleArray: isArrayOfSchema !== null && typeof primitivaDataTypes[isArrayOfSchema] !== 'undefined'
       }
-      , children;
+      , children = null;
 
-      if (typeof primitivaDataTypes[datatype] === 'undefined') {
+      if (!isPrimitiveDataType) {
         if (datatype === object) {
             children = Object.keys(dataTypeSchema)
         } else if (!config.isSimpleArray) {
-            children = Object.keys(arrayOf)
+            children = Object.keys(isArrayOfSchema)
         }
       }
 
       config = {
           ...config,
           children,
-          mandatoryChildren: children.filter(child => child.substr(-1) === '!')
+          mandatoryChildren: isPrimitiveDataType ? null : children.filter(child => child.substr(-1) === '!')
       }
 
       return config
