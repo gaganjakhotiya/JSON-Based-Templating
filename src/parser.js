@@ -1,12 +1,26 @@
 import {validateJSON} from './validator'
 
-let schema
 export function setSchema(newSchema) {
-    schema = newSchema
+    _schema = newSchema
 }
 
 export function getDOMElementFromJSON(json){
-    console.log('JSON', json)
+    try {
+        validateJSON('__root', json, _schema)
+    } catch (e) {
+        return createDOMNode(e)
+    }
 
-    validateJSON('__root', json, schema)
+    return createDOMNode('success')
+}
+
+let _schema
+function createDOMNode(content){
+    let node = document.createElement('div')
+    node.innerHTML = content
+    return node
+}
+
+function parseJSON(json, schema){
+
 }

@@ -10,12 +10,13 @@ module.exports = {
             "address!": "string",
             "city!": "string",
             "country!": "string",
-            "pincode!": "string"
+            "pincode!": "string",
         },
         "profiles": {
             "github": "string",
-            "linkedin": "string"
-        }
+            "linkedin": "string",
+        },
+        "__template": "<div><h1>${name}</h1></div>"
     },
     "work": [{
         "company!": "string",
@@ -23,7 +24,7 @@ module.exports = {
         "startDate!": "string",
         "endDate": "string",
         "website": "string",
-        "summary": "string"
+        "summary": "string",
     }],
     "education!": [{
         "school!": "string",
@@ -64,5 +65,13 @@ module.exports = {
     "references": [{
         "name!": "string",
         "note!": "string"
-    }]
+    }],
+    "work__template": "",
+    "education__template": "",
+    "volunteer__template": "",
+    "awards__template": "",
+    "skills__template": "",
+    "languages__template": "",
+    "interests__template": "",
+    "references__template": "",
 }
