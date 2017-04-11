@@ -11,14 +11,30 @@ export function getDOMElementFromJSON(json){
         return createDOMNode(e)
     }
 
-    return createDOMNode('success')
+    return createDOMNode(parseJSON(json, _schema))
 }
 
+// Private Methods
+
 let _schema
+
+function getKeys(str){
+	return str.match(/(?:^|\$){(.*?)(?:}|$)/g)
+}
 function createDOMNode(content){
     let node = document.createElement('div')
     node.innerHTML = content
     return node
+}
+
+function fillTemplate(template, valueMap){
+    let out =  template ? getKeys(template).reduce((updatedTemplate, templateLiteral) => {
+	    let templateKey = templateLiteral.substring(2, templateLiteral.length - 1)
+
+        return updatedTemplate.replace(templateLiteral, valueMap[templateKey])
+    }, template) : ''
+
+    return out
 }
 
 function parseJSON(json, schema, template){
@@ -30,20 +46,20 @@ function parseJSON(json, schema, template){
             return updatedTemplate + fillTemplate(template, {value: value})
         }, '')
     } else if (typeof json === 'object') {
-        output = Object.keys(json).map(item => {
+        let valueMap = {...json}
 
+        Object.keys(valueMap).forEach(field => {
+            let fieldSchema = schema[field] || schema[field + '!']
+            if (!fieldSchema)
+                return
+
+            let fieldTemplate = schema[field + '__template']
+            valueMap[field] = typeof valueMap[field] === 'object'
+                ? parseJSON(valueMap[field], fieldSchema, fieldTemplate)
+                : valueMap[field]
         })
+
+        output = fillTemplate(schema.__template, valueMap)
     }
-}
-
-function getKeys(str){
-	return str.match(/(?:^|\$){(.*?)(?:}|$)/g)
-}
-
-function fillTemplate(template, valueMap){
-    return template ? getKeys(template).reduce((updatedTemplate, templateLiteral) => {
-	    let templateKey = templateLiteral.substring(2, templateLiteral.length - 1)
-
-        return updatedTemplate.replace(templateLiteral, valueMap[templateKey])
-    }, template) : ''
+    return output
 }

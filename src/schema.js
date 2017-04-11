@@ -74,4 +74,5 @@ module.exports = {
     "languages__template": "",
     "interests__template": "",
     "references__template": "",
+    "__template": "<div>${basic}</div>"
 }
