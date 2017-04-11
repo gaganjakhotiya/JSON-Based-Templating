@@ -41,6 +41,9 @@ export function validateJSON(key, json, schema) {
 
     try {
         if (config.datatype === Datatypes.array) {
+            if (!Array.isArray(json))
+                throw `Expected an array against \'${key}\'`
+
             let lastIndex = 0
             if (config.isSimpleArray) {
                 isValid = json.every((child, index) => {
@@ -61,6 +64,9 @@ export function validateJSON(key, json, schema) {
                 })
             }
         } else {
+            if (typeof json !== 'object')
+                throw `Expected an object against \'${key}\'`
+
             isValid = !mandatoryChildren || mandatoryChildren.every(child => {
                 lastChecked = child = child.substr(0, child.length - 1)
                 return typeof json[child] !== 'undefined'
