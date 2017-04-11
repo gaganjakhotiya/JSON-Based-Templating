@@ -1,4 +1,4 @@
-import Datatypes from './datatypes'
+import {Datatypes} from './datatypes'
 import {isArrayOf, isObject, isNumber, isString, isMandatory, getJSONKey} from './utils'
 
 export function validateJSON(key, json, schema) {
@@ -31,7 +31,7 @@ export function validateJSON(key, json, schema) {
 
 function verifyJSONDatatype(json, datatype, key){
     if ((datatype === Datatypes.array && !Array.isArray(json))
-        || typeof json !== datatype) {
+        || (datatype !== Datatypes.array && typeof json !== datatype)) {
         throw `Expected an ${datatype} against \'${key}\'`
     }
 }
@@ -41,7 +41,7 @@ function validateArray(json, config){
     if (config.isSimpleArray) {
         let isValid = json.every((child, index) => {
             lastIndex = index
-            return typeof child === config.isArrayOf
+            return typeof child === config.isArrayOfSchema
         })
 
         if (!isValid)
@@ -50,9 +50,9 @@ function validateArray(json, config){
         json.every((child, index) => {
             lastIndex = index
             try {
-                validateJSON('__array', child, config.isArrayOf)
+                validateJSON('__array', child, config.isArrayOfSchema)
             } catch (exception) {
-                throw `Error at index \'${lastIndex}\' -> ${exception.message}`
+                throw `Error at index \'${lastIndex}\' -> ${exception.message || exception}`
             }
         })
     }
@@ -99,7 +99,7 @@ function getFieldConfig(key, dataTypeSchema) {
       config = {
           ...config,
           children,
-          mandatoryChildren: isPrimitiveDataType ? null : children.filter(child => child.substr(-1) === '!')
+          mandatoryChildren: children && children.filter(child => child.substr(-1) === '!')
       }
 
       return config

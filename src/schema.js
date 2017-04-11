@@ -20,8 +20,8 @@ module.exports = {
     "work": [{
         "company!": "string",
         "position!": "string",
-        "startDate!": "date",
-        "endDate!": "date",
+        "startDate!": "string",
+        "endDate": "string",
         "website": "string",
         "summary": "string"
     }],
@@ -29,22 +29,22 @@ module.exports = {
         "school!": "string",
         "area": "string",
         "degree": "string",
-        "startDate": "date",
-        "endDate": "date",
+        "startDate": "string",
+        "endDate": "string",
         "score": "number",
         "courses": "string[]"
     }],
     "volunteer": [{
         "organization!": "string",
         "position!": "string",
-        "startDate!": "date",
-        "endDate!": "date",
+        "startDate!": "string",
+        "endDate!": "string",
         "website": "string",
         "summary": "string"
     }],
     "awards": [{
         "title!": "string",
-        "date": "date",
+        "string": "string",
         "awarder": "string",
         "summary": "string"
     }],
